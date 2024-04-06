@@ -1,0 +1,118 @@
+1. python -m venv venv
+2. cd venv
+3. Scripts\activate
+4. cd .. 
+5. pip install django
+6. django-admin startproject formularios
+7. python manage.py startapp myformsapp
+8. Agregar la aplicación en el setting.py
+
+    INSTALLED_APPS = [        ...        'myformsapp',        ...    ]
+
+9. python manage.py makemigrations myformsapp
+10. python manage.py migrate
+
+11. Modificar el archivo models.py
+
+    from django.db import models
+
+    class MyModel(models.Model):
+        field1 = models.CharField(max_length=100)
+        field2 = models.IntegerField()
+
+12. Crear el archivo forms.py
+
+    from django import forms
+    from .models import MyModel
+
+    class MyForm(forms.ModelForm):
+        class Meta:
+            model = MyModel
+            fields = '__all__'
+
+13. Crear el archivo urls.py en myformsapp
+
+    from django.urls import path
+    from . import views
+
+    urlpatterns = [
+        path('nueva-pagina/', views.nueva_pagina, name='nueva_pagina'),
+    ]
+
+14. En myformsapp, crear la carpeta "templates" y dentro de ella la carpeta "myformsapp" con el archivo "nueva_pagina.html"
+
+    {% extends 'base.html' %}
+
+    {% block title %}Nueva Página{% endblock %}
+
+    {% block content %}
+        <h1>Esta es una nueva página</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Enviar</button>
+        </form>
+    {% endblock %}
+
+15. En la carpeta principal de nuestro proyecto, crear la carpeta "templates" con los archivos "base.html", "header.html", "nav.html", "footer.html"
+
+    base.html
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Mi Sitio Web{% endblock %}</title>
+    </head>
+    <body>
+        {% include 'header.html' %}
+
+        {% include 'nav.html' %}
+
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+
+        {% include 'footer.html' %}
+    </body>
+    </html>
+
+    header.html
+
+    <header>
+        <h1>¡Bienvenido a mi Sitio Web!</h1>
+    </header>
+
+    nav.html
+
+    <nav>
+        <ul>
+            <li><a href="#">Inicio</a></li>
+            <li><a href="#">Acerca de</a></li>
+            <li><a href="#">Contacto</a></li>
+        </ul>
+    </nav>
+
+    footer.html
+
+    <footer>
+        <p>&copy; Mi Sitio Web. Todos los derechos reservados.</p>
+    </footer>
+
+16. Modificar el archivo setting.py para agregar nuestra app y las rutas a nuestros templates
+
+    INSTALLED_APPS = [        'django.contrib.admin',        'django.contrib.auth',        'django.contrib.contenttypes',        'django.contrib.sessions',        'django.contrib.messages',        'django.contrib.staticfiles',        'myformsapp',    ]
+
+    TEMPLATES = [        {            'BACKEND': 'django.template.backends.django.DjangoTemplates',            'DIRS': [BASE_DIR / 'templates'],
+            'APP_DIRS': True,
+            'OPTIONS': {
+                'context_processors': [
+                    'django.template.context_processors.debug',
+                    'django.template.context_processors.request',
+                    'django.contrib.auth.context_processors.auth',
+                    'django.contrib.messages.context_processors.messages',
+                ],
+            },
+        },
+    ]
